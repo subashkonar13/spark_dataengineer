@@ -70,4 +70,4 @@ docker run SparkData
 
 1. ##### Create an AKS cluster
 
-Ref Link-https://docs.microsoft.com/en-us/azure/aks/kubernetes-action#code-try-0
+I have referred this link for hasslefree deployment-https://docs.microsoft.com/en-us/azure/aks/kubernetes-action#code-try-0
