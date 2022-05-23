@@ -1,13 +1,14 @@
 import pandas as pd
 import re
-#from pyspark.sql.functions import udf
-#from pyspark.sql.types import StringType
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+from pyspark.sql.types import DateType
 import ast
 from pandas import json_normalize
-#from pyspark.sql.functions import explode
+from pyspark.sql.functions import explode
 import warnings
 warnings.filterwarnings("ignore")
-from pyspark.sql.functions import *
 
   
 def mask_func(colVal):
@@ -38,11 +39,15 @@ if __name__=="__main__":
    data1=user_data['profile'].apply(pd.Series)
    user_data = user_data.join(data1).drop(columns='profile')
    
-#------Total Count of Messages in a day-------------
-   count_total=messages_data['message'].value_counts().sum()
+
+  
 #messages_data=messages_data.drop(['message'], inplace=True, axis=1)
    users_df=spark.createDataFrame(user_data)
    messages_df=spark.createDataFrame(messages_data)
+   messages_df = messages_df.withColumn("created",messages_df['createdAt'].cast(DateType()))
+ #------Total Count of Messages in a day-------------
+   count_total_messages=messages_df.groupBy("created").count()
+    
 
 #-------Count of Users who didn't received any messages------------
    no_message_count=user_df.join(messages_df,user_df.id !=  messages_df.receiverId,"inner").select("firstName","lastName").distinct().count()
@@ -63,9 +68,24 @@ if __name__=="__main__":
    rejected_sub_count=rejected_sub_count.join(messages_df,rejected_sub_count.id == messages_df.senderId,"inner").select("firstName","lastName","key","value","id").filter(rejected_sub_count.key.contains('status')).distinct().count()
 
 #----------------Result-------------
-   print(count_total)
-   print(active_sub_count)
-   print(no_message_count)
-   print(rejected_sub_count)
-   
+   print("Active Subscription Count is:",active_sub_count)
+   print("Count of Users who didn't received any messages is:",no_message_count)
+   print("Users Sending messages without Active Subscription:",rejected_sub_count)
+   count_total_messages.show(truncate=False)
    spark.stop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
