@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: contoso-website
+  name: sukonar
 spec:
   selector:
     matchLabels:
-      app: contoso-website
+      app: sukonar
   template:
     metadata:
       labels:
-        app: contoso-website
+        app: sukonar
     spec:
       containers:
         - image: gcr.io/datamechanics/spark:platform-3.1-dm14
